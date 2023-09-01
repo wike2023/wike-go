@@ -122,12 +122,14 @@ demo
 ### 日志
   基于zap库二次封装，加入了 trace_id
 #### 特殊方法
-  GetLoggerWithGinCtx(ctx *gin.Context) *zaplog.Logger //获取gin的上下文的日志
-  GetLoggerWithTraceID(ctx *context.Context) *zap.SugaredLogger    //获取trace_id的日志
+    GetLoggerWithGinCtx(ctx *gin.Context) *zaplog.Logger //获取gin的上下文的日志
+    GetLoggerWithTraceID(ctx *context.Context) *zap.SugaredLogger    //获取trace_id的日志
+
 调用这2个方法会自动添加trace_id的日志，如果没有trace_id会自动添加一个trace_id
+
 #### 内存日志，会保存最近2000条日志，只会收集info，和warn级别日志 
-  templog.LogInfo.Show() //打印日志
-  templog.LogInfo.All() //返回日志列表
+    templog.LogInfo.Show() //打印日志
+    templog.LogInfo.All() //返回日志列表
 
 ## 工具函数
     CopyProperties(src interface{}, dest interface{}) //结构体属性拷贝 copy.go
