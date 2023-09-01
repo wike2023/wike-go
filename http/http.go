@@ -3,16 +3,17 @@ package coreHttp
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	zaplog "github.com/wike2023/wike-go/lib/log"
 	"go.uber.org/fx"
 	"net"
 	"net/http"
 )
 
-func (this *GCore) NewHTTPServer(lc fx.Lifecycle, zap *zaplog.Logger, r *gin.Engine) *http.Server {
+func (this *GCore) NewHTTPServer(lc fx.Lifecycle, zap *zaplog.Logger, r *gin.Engine, cfg *viper.Viper) *http.Server {
 	this.gin = r
 	srv := &http.Server{
-		Addr:    ":" + this.port,
+		Addr:    ":" + cfg.GetString("port"),
 		Handler: this.gin,
 	}
 	this.gin.GET("/healthz", func(c *gin.Context) {

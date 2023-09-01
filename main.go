@@ -13,5 +13,5 @@ func main() {
 		GlobalUse(coreHttp.RequestDurationMiddleware2).
 		Use("/api", coreHttp.HeaderMiddleware, coreHttp.CookieMiddleware).
 		Use("/api/v2", coreHttp.HeaderMiddleware).
-		Run("9990")
+		Run()
 }

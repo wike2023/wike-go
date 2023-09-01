@@ -66,8 +66,8 @@ func (r *Router2) Path() string {
 	return "/api/v2"
 }
 func (this *Router2) Build(r *gin.RouterGroup) {
-	this.log.Warn("111111")
-	this.log.Error("333333")
+	//	this.log.Warnln("111111")
+	//this.log.Error("333333")
 	r.GET("/ping", this.Get)
 	r.GET("/wike2", TestMiddleware, this.Get)
 	r.Use(func(ctx *gin.Context) {

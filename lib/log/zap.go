@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
+	"github.com/spf13/viper"
 	"github.com/wike2023/wike-go/lib/templog"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -37,15 +38,6 @@ var (
 	errorConsoleWS                 = zapcore.Lock(os.Stderr)
 )
 
-func init() {
-	logger = &Logger{
-		Opts: &Options{
-			Development: true,
-		},
-	}
-	initLogger()
-}
-
 type Logger struct {
 	*zap.SugaredLogger
 	sync.RWMutex
@@ -68,6 +60,15 @@ func initLogger(cf ...*Options) {
 	logger.init()
 	logger.Info("[initLogger] zap plugin initializing completed")
 	logger.inited = true
+}
+func LoggerInit(cfg *viper.Viper) *Logger {
+	logger = &Logger{
+		Opts: &Options{
+			Development: cfg.GetBool("development"),
+		},
+	}
+	initLogger()
+	return logger
 }
 
 // GetLogger returns logger
@@ -171,7 +172,6 @@ func (l *Logger) getMemoryWriteSyncer() zapcore.WriteSyncer {
 	}
 	templog.LogInfo = logf
 	return zapcore.AddSync(logf)
-	return zapcore.AddSync(logf)
 }
 func (l *Logger) setSyncers() {
 	errWS = l.getLogWriteSyncer(l.Opts.ErrorFileName)
@@ -188,25 +188,26 @@ func (l *Logger) cores() zap.Option {
 	consoleEncoder := zapcore.NewConsoleEncoder(encoderConfig)
 	fileEncoder := zapcore.NewConsoleEncoder(encoderConfig)
 	errPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return lvl > zapcore.WarnLevel && zapcore.WarnLevel-l.zapConfig.Level.Level() > -1
+		return lvl == zapcore.ErrorLevel
 	})
 	warnPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return lvl == zapcore.WarnLevel && zapcore.WarnLevel-l.zapConfig.Level.Level() > -1
+		return lvl == zapcore.WarnLevel
 	})
 	infoPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return lvl == zapcore.InfoLevel && zapcore.InfoLevel-l.zapConfig.Level.Level() > -1
+		return lvl == zapcore.InfoLevel
 	})
 	CachePriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 		return lvl == zapcore.WarnLevel || lvl == zapcore.InfoLevel
 	})
 	debugPriority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-		return lvl == zapcore.DebugLevel && zapcore.DebugLevel-l.zapConfig.Level.Level() > -2
+		return lvl == zapcore.DebugLevel
 	})
 	cores := []zapcore.Core{
 		zapcore.NewCore(fileEncoder, errWS, errPriority),
 		zapcore.NewCore(fileEncoder, warnWS, warnPriority),
 		zapcore.NewCore(fileEncoder, infoWS, infoPriority),
 		zapcore.NewCore(fileEncoder, CacheWS, CachePriority),
+		zapcore.NewCore(consoleEncoder, debugWS, debugPriority),
 	}
 	if l.Opts.Development {
 		cores = append(cores, []zapcore.Core{
@@ -214,7 +215,6 @@ func (l *Logger) cores() zap.Option {
 			zapcore.NewCore(consoleEncoder, debugConsoleWS, warnPriority),
 			zapcore.NewCore(consoleEncoder, debugConsoleWS, infoPriority),
 			zapcore.NewCore(consoleEncoder, debugConsoleWS, debugPriority),
-			zapcore.NewCore(fileEncoder, debugWS, debugPriority),
 		}...)
 	}
 	return zap.WrapCore(func(c zapcore.Core) zapcore.Core {

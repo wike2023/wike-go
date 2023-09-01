@@ -29,10 +29,8 @@ func God() *GCore {
 		port:       "8080",
 	}
 }
-func (this *GCore) Run(port string) {
-	if port != "" {
-		this.port = port
-	}
+func (this *GCore) Run() {
+
 	this.app = fx.New(
 		Module,
 		fx.NopLogger,

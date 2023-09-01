@@ -1,0 +1,5 @@
+port: 9990
+development: true
+mysql:
+  enabled: true
+  host: localhost

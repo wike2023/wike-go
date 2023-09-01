@@ -2,6 +2,7 @@ package coreHttp
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/wike2023/wike-go/config"
 	zaplog "github.com/wike2023/wike-go/lib/log"
 	"go.uber.org/fx"
 	"net/http"
@@ -9,7 +10,7 @@ import (
 )
 
 var Module = fx.Module("infra",
-	fx.Provide(zaplog.GetLogger),
+	fx.Provide(zaplog.LoggerInit, config.Config),
 	fx.Invoke(func(*http.Server) {}),
 )
 
