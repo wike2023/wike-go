@@ -136,3 +136,16 @@ demo
     PasswordVerify //密码验证 password.go
     RandomString 生成随机长度的字符串 random.go
     GetRandomNum 生成随机数字(包括边界) random.go
+
+### 待完善
+
+1. 缓存
+2. http客户端
+3. 定时任务
+4. 消息队列
+5. orm
+6. redis
+7. 服务熔断
+8. 服务限流
+9. 负载均衡
+10. 更多...
